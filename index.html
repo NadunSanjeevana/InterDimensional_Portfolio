@@ -4,610 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dimensional Portfolio</title>
-    <style>
-      :root {
-        --primary: #6e44ff;
-        --secondary: #ff44e3;
-        --tertiary: #44d9ff;
-        --dark: #171717;
-        --light: #f8f8f8;
-        --transition-speed: 0.5s;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
-
-      body {
-        background-color: var(--dark);
-        color: var(--light);
-        overflow-x: hidden;
-        position: relative;
-        min-height: 100vh;
-      }
-
-      .dimension {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.8s, visibility 0.8s;
-        overflow: hidden;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .dimension.active {
-        opacity: 1;
-        visibility: visible;
-        z-index: 10;
-      }
-
-      /* Portal Navigation */
-      .portal-nav {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 15px;
-        z-index: 100;
-        background: rgba(0, 0, 0, 0.6);
-        padding: 10px 20px;
-        border-radius: 30px;
-        backdrop-filter: blur(5px);
-      }
-
-      .portal-btn {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        cursor: pointer;
-        background: var(--dark);
-        border: 2px solid;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s;
-      }
-
-      .portal-btn:hover {
-        transform: scale(1.2);
-      }
-
-      .portal-btn::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        transform: translate(-50%, -50%) scale(0);
-        border-radius: 50%;
-        transition: transform 0.3s;
-      }
-
-      .portal-btn:hover::before {
-        transform: translate(-50%, -50%) scale(1.5);
-      }
-
-      /* Individual Dimension Styles */
-      #home {
-        background: radial-gradient(circle, #111 0%, #000 100%);
-      }
-
-      #about {
-        background: radial-gradient(circle, #1a0b2e 0%, #090418 100%);
-      }
-
-      #projects {
-        background: radial-gradient(circle, #0b1a2e 0%, #04090f 100%);
-      }
-
-      #education {
-        background: radial-gradient(circle, #1e0b0b 0%, #100404 100%);
-      }
-
-      #certificates {
-        background: radial-gradient(circle, #0b2e0b 0%, #041804 100%);
-      }
-
-      #contact {
-        background: radial-gradient(circle, #2e1e0b 0%, #180e04 100%);
-      }
-
-      /* Home Dimension */
-      .home-content {
-        text-align: center;
-      }
-
-      .name {
-        font-size: 5rem;
-        color: var(--light);
-        margin-bottom: 1rem;
-        position: relative;
-        display: inline-block;
-      }
-
-      .name::after {
-        content: "";
-        position: absolute;
-        bottom: -10px;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(
-          90deg,
-          var(--primary),
-          var(--secondary),
-          var(--tertiary)
-        );
-      }
-
-      .title {
-        font-size: 1.5rem;
-        color: var(--tertiary);
-        margin-bottom: 2rem;
-      }
-
-      .dimension-intro {
-        font-size: 1rem;
-        max-width: 600px;
-        margin: 0 auto;
-        line-height: 1.6;
-      }
-
-      /* About Dimension */
-      .about-container {
-        position: relative;
-        width: 100%;
-        height: 80vh;
-        max-width: 1200px;
-      }
-
-      .personality-element {
-        position: absolute;
-        padding: 20px;
-        background: rgba(110, 68, 255, 0.2);
-        border: 1px solid var(--primary);
-        border-radius: 10px;
-        max-width: 250px;
-        transition: all 0.5s ease;
-        cursor: pointer;
-        transform-origin: center;
-      }
-
-      .personality-element:hover {
-        background: rgba(110, 68, 255, 0.4);
-        transform: scale(1.1);
-        z-index: 5;
-      }
-
-      .personality-element h3 {
-        color: var(--secondary);
-        margin-bottom: 10px;
-      }
-
-      /* Projects Dimension */
-      .projects-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
-        justify-content: center;
-        width: 100%;
-        max-width: 1200px;
-      }
-
-      .project-dimension {
-        width: 300px;
-        height: 300px;
-        position: relative;
-        perspective: 1000px;
-        cursor: pointer;
-      }
-
-      .project-cube {
-        width: 100%;
-        height: 100%;
-        transform-style: preserve-3d;
-        transition: transform 1s;
-        position: relative;
-      }
-
-      .project-dimension:hover .project-cube {
-        transform: rotateY(180deg);
-      }
-
-      .project-face {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        backface-visibility: hidden;
-        overflow: hidden;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        text-align: center;
-      }
-
-      .project-front {
-        background: rgba(68, 217, 255, 0.2);
-        border: 1px solid var(--tertiary);
-      }
-
-      .project-back {
-        background: rgba(255, 68, 227, 0.2);
-        border: 1px solid var(--secondary);
-        transform: rotateY(180deg);
-      }
-
-      .project-title {
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-        color: var(--light);
-      }
-
-      /* Education Dimension */
-      .education-timeline {
-        position: relative;
-        width: 100%;
-        max-width: 1000px;
-        height: 70vh;
-        display: flex;
-        align-items: center;
-        perspective: 1000px;
-      }
-
-      .timeline-line {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary), var(--tertiary));
-        transform: translateY(-50%) rotateX(45deg);
-        transform-style: preserve-3d;
-      }
-
-      .education-item {
-        position: absolute;
-        width: 250px;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid var(--primary);
-        border-radius: 10px;
-        transform-style: preserve-3d;
-        transition: all 0.5s;
-        cursor: pointer;
-      }
-
-      .education-item:hover {
-        transform: scale(1.1) translateZ(30px);
-        z-index: 10;
-        background: rgba(255, 255, 255, 0.2);
-      }
-
-      .education-item h3 {
-        color: var(--secondary);
-        margin-bottom: 5px;
-      }
-
-      .education-year {
-        font-size: 0.9rem;
-        color: var(--tertiary);
-        margin-bottom: 10px;
-      }
-
-      /* Certificates Dimension */
-      .certificates-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
-        justify-content: center;
-        width: 100%;
-        max-width: 1200px;
-      }
-
-      .certificate-artifact {
-        width: 220px;
-        height: 300px;
-        position: relative;
-        perspective: 1000px;
-        cursor: pointer;
-      }
-
-      .certificate-inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        transform-style: preserve-3d;
-        transition: transform 0.6s;
-      }
-
-      .certificate-artifact:hover .certificate-inner {
-        transform: rotateY(180deg);
-      }
-
-      .certificate-face {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        backface-visibility: hidden;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        text-align: center;
-      }
-
-      .certificate-front {
-        background: rgba(110, 68, 255, 0.2);
-        border: 2px solid var(--primary);
-      }
-
-      .certificate-back {
-        background: rgba(68, 217, 255, 0.2);
-        border: 2px solid var(--tertiary);
-        transform: rotateY(180deg);
-      }
-
-      .certificate-title {
-        font-size: 1.2rem;
-        color: var(--light);
-        margin-bottom: 10px;
-      }
-
-      .certificate-icon {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        color: var(--secondary);
-      }
-
-      /* Contact Dimension */
-      .contact-doors {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-        max-width: 1000px;
-      }
-
-      .contact-door {
-        width: 200px;
-        height: 250px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        position: relative;
-        transition: all 0.5s;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-
-      .contact-door:hover {
-        transform: scale(1.1);
-        background: rgba(255, 255, 255, 0.2);
-        border-color: var(--secondary);
-      }
-
-      .door-icon {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        transition: all 0.3s;
-      }
-
-      .contact-door:hover .door-icon {
-        transform: scale(1.2);
-        color: var(--tertiary);
-      }
-
-      .door-title {
-        font-size: 1.2rem;
-        transition: all 0.3s;
-      }
-
-      .door-details {
-        margin-top: 15px;
-        opacity: 0;
-        transition: opacity 0.5s;
-        text-align: center;
-        padding: 0 10px;
-      }
-
-      .contact-door:hover .door-details {
-        opacity: 1;
-      }
-
-      /* Easter eggs */
-      .easter-egg {
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        background: transparent;
-        cursor: pointer;
-        z-index: 50;
-      }
-
-      .egg-1 {
-        top: 20px;
-        right: 20px;
-      }
-
-      .egg-2 {
-        bottom: 80px;
-        left: 40px;
-      }
-
-      .egg-3 {
-        top: 50%;
-        right: 40px;
-      }
-
-      .konami-egg {
-        position: fixed;
-        bottom: 10px;
-        left: 10px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.3);
-      }
-
-      /* Matrix rain effect (hidden until activated) */
-      .matrix-rain {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        display: none;
-      }
-
-      /* Dimensional transition effects */
-      .dimension-transition {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 200;
-        pointer-events: none;
-        opacity: 0;
-      }
-
-      .portal-effect {
-        background-color: rgba(110, 68, 255, 0.2);
-        box-shadow: 0 0 100px 20px var(--primary);
-        animation: portalEffect 1.5s ease-in-out forwards;
-      }
-
-      .warp-effect {
-        background: radial-gradient(
-          circle,
-          rgba(255, 68, 227, 0.6) 0%,
-          rgba(255, 68, 227, 0) 70%
-        );
-        animation: warpEffect 1.5s ease-in-out forwards;
-      }
-
-      .fold-effect {
-        background: linear-gradient(
-          90deg,
-          rgba(68, 217, 255, 0.6),
-          rgba(68, 217, 255, 0)
-        );
-        animation: foldEffect 1.5s ease-in-out forwards;
-      }
-
-      @keyframes portalEffect {
-        0% {
-          opacity: 0;
-          transform: scale(0);
-        }
-        50% {
-          opacity: 1;
-          transform: scale(1.5);
-        }
-        100% {
-          opacity: 0;
-          transform: scale(2);
-        }
-      }
-
-      @keyframes warpEffect {
-        0% {
-          opacity: 0;
-          transform: scale(0);
-        }
-        50% {
-          opacity: 0.7;
-          transform: scale(1);
-        }
-        100% {
-          opacity: 0;
-          transform: scale(2);
-        }
-      }
-
-      @keyframes foldEffect {
-        0% {
-          opacity: 0;
-          clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%);
-        }
-        50% {
-          opacity: 0.7;
-          clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-        100% {
-          opacity: 0;
-          clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        }
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .name {
-          font-size: 3rem;
-        }
-
-        .portal-nav {
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-
-        .projects-container,
-        .certificates-container,
-        .contact-doors {
-          flex-direction: column;
-          align-items: center;
-        }
-      }
-    </style>
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Nadun Sanjeevana | Portfolio</title>
-        <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/styles.css" />
       </head>
       <body>
         <!-- Dimension Transition Effects -->
-        <div
-          class="dimension-transition portal-effect"
-          id="portal-transition"
-        ></div>
-        <div
-          class="dimension-transition warp-effect"
-          id="warp-transition"
-        ></div>
-        <div
-          class="dimension-transition fold-effect"
-          id="fold-transition"
-        ></div>
+    <div class="dimension-transition portal-effect" id="portal-transition"></div>
+    <div class="dimension-transition warp-effect" id="warp-transition"></div>
+    <div class="dimension-transition fold-effect" id="fold-transition"></div>
 
         <!-- Matrix Rain Canvas (Easter Egg) -->
         <canvas class="matrix-rain" id="matrixRain"></canvas>
 
         <!-- Home Dimension -->
         <section id="home" class="dimension active">
+      <div class="particles" id="particles"></div>
           <div class="home-content">
             <h1 class="name">Nadun Sanjeevana</h1>
             <p class="title">Software Engineer & CS Undergraduate</p>
@@ -675,19 +85,26 @@
               <div class="project-cube">
                 <div class="project-face project-front">
                   <h3 class="project-title">API Rate Limiter</h3>
-                  <p>
-                    Advanced rate limiting service with multiple algorithms and
-                    metrics visualization.
+              <p class="project-description">
+                Advanced rate limiting service with multiple algorithms and metrics visualization
                   </p>
+              <div class="project-tech">
+                <span class="tech-tag">Go</span>
+                <span class="tech-tag">Redis</span>
+                <span class="tech-tag">Prometheus</span>
+              </div>
                 </div>
                 <div class="project-face project-back">
-                  <h3>Technologies Used</h3>
-                  <p>Go, Redis, Prometheus, Grafana, JWT</p>
-                  <a
-                    href="https://github.com/NadunSanjeevana/go-rate-limiter"
-                    class="project-link"
-                    >View Project</a
-                  >
+              <h3 class="project-title">Details</h3>
+              <p class="project-description">
+                A high-performance rate limiting service supporting multiple algorithms including Token Bucket and Sliding Window. Features real-time metrics visualization and Redis-based distributed rate limiting.
+              </p>
+              <div class="project-links">
+                <a href="https://github.com/NadunSanjeevana/go-rate-limiter" class="project-link" target="_blank">
+                  <span class="github-icon"></span>
+                  View on GitHub
+                </a>
+              </div>
                 </div>
               </div>
             </div>
@@ -695,15 +112,26 @@
               <div class="project-cube">
                 <div class="project-face project-front">
                   <h3 class="project-title">Satellite Imagery Analysis</h3>
-                  <p>
-                    Computer vision system for segmenting paddy fields and
-                    predicting yield from satellite imagery.
+              <p class="project-description">
+                Computer vision system for segmenting paddy fields and predicting yield
                   </p>
+              <div class="project-tech">
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">TensorFlow</span>
+                <span class="tech-tag">QGIS</span>
+              </div>
                 </div>
                 <div class="project-face project-back">
-                  <h3>Technologies Used</h3>
-                  <p>Python, TensorFlow, Google Earth Engine, QGIS</p>
-                  <a href="#" class="project-link">Final Year Project</a>
+              <h3 class="project-title">Details</h3>
+              <p class="project-description">
+                Final year project using deep learning to analyze satellite imagery for agricultural purposes. Implements custom CNN architectures for field segmentation and yield prediction.
+              </p>
+              <div class="project-links">
+                <a href="#" class="project-link" target="_blank">
+                  <span class="github-icon"></span>
+                  View Project
+                </a>
+              </div>
                 </div>
               </div>
             </div>
@@ -711,19 +139,26 @@
               <div class="project-cube">
                 <div class="project-face project-front">
                   <h3 class="project-title">Digital Ad Analyzer</h3>
-                  <p>
-                    System for extracting key information from newspaper
-                    advertisements using NLP and OCR.
+              <p class="project-description">
+                System for extracting key information from newspaper advertisements
                   </p>
+              <div class="project-tech">
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">Flask</span>
+                <span class="tech-tag">OCR</span>
+              </div>
                 </div>
                 <div class="project-face project-back">
-                  <h3>Technologies Used</h3>
-                  <p>Python, Flask, MongoDB, OCR, NLP</p>
-                  <a
-                    href="https://github.com/Newspaper-Advertisement-Analyzer"
-                    class="project-link"
-                    >View Project</a
-                  >
+              <h3 class="project-title">Details</h3>
+              <p class="project-description">
+                NLP and OCR-based system for analyzing newspaper advertisements. Extracts key information, categorizes content, and provides insights through a web interface.
+              </p>
+              <div class="project-links">
+                <a href="https://github.com/Newspaper-Advertisement-Analyzer" class="project-link" target="_blank">
+                  <span class="github-icon"></span>
+                  View on GitHub
+                </a>
+              </div>
                 </div>
               </div>
             </div>
@@ -831,7 +266,7 @@
           <h2>Contact Dimension</h2>
           <div class="contact-doors">
             <div class="contact-door">
-              <div class="door-icon">✉️</div>
+          <img src="https://cdn-icons-png.flaticon.com/512/3178/3178158.png" alt="Email" class="door-icon" />
               <div class="door-title">Email</div>
               <div class="door-details">
                 <p>nadunt.20@cse.mrt.ac.lk</p>
@@ -839,7 +274,7 @@
               </div>
             </div>
             <div class="contact-door">
-              <div class="door-icon">🔗</div>
+          <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" class="door-icon" />
               <div class="door-title">LinkedIn</div>
               <div class="door-details">
                 <p>Connect with me professionally</p>
@@ -847,7 +282,7 @@
               </div>
             </div>
             <div class="contact-door">
-              <div class="door-icon">💻</div>
+          <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" class="door-icon" />
               <div class="door-title">GitHub</div>
               <div class="door-details">
                 <p>Check out my code repositories</p>
@@ -855,577 +290,76 @@
               </div>
             </div>
             <div class="contact-door">
-              <div class="door-icon">📝</div>
+          <img src="https://cdn-icons-png.flaticon.com/512/5968/5968906.png" alt="Medium" class="door-icon" />
               <div class="door-title">Medium</div>
               <div class="door-details">
                 <p>Read my technical articles</p>
                 <p>medium.com/@nadunsanjeevana2001</p>
               </div>
             </div>
+        <div class="contact-door" id="message-door">
+          <img src="https://cdn-icons-png.flaticon.com/512/542/542638.png" alt="Message" class="door-icon" />
+          <div class="door-title">Send Message</div>
+          <div class="door-details">
+            <p>Leave me a message</p>
+            <p>I'll get back to you soon</p>
           </div>
+        </div>
+      </div>
+
+      <div class="contact-form-container" id="contact-form">
+        <form class="contact-form">
+          <div class="form-group">
+            <input type="text" class="form-input" id="name" placeholder=" " required />
+            <label class="form-label" for="name">Your Name</label>
+          </div>
+          <div class="form-group">
+            <input type="email" class="form-input" id="email" placeholder=" " required />
+            <label class="form-label" for="email">Your Email</label>
+          </div>
+          <div class="form-group">
+            <textarea class="form-input" id="message" placeholder=" " rows="4" required></textarea>
+            <label class="form-label" for="message">Your Message</label>
+          </div>
+          <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+      </div>
+      <button class="back-to-contact" id="back-to-contact">&times;</button>
+
+      <div class="message-preview" id="message-preview">
+        <button class="close-preview">&times;</button>
+        <h3>Message Preview</h3>
+        <p><strong>From:</strong> <span id="preview-name"></span></p>
+        <p><strong>Email:</strong> <span id="preview-email"></span></p>
+        <p><strong>Message:</strong></p>
+        <p id="preview-message"></p>
+      </div>
+
           <div class="konami-egg">↑↑↓↓←→←→BA</div>
         </section>
 
+    <!-- Alien Message Button -->
+    <button class="alien-button" id="alien-button"></button>
+    <div class="alien-message" id="alien-message">
+      <div class="message-title">👽 Interdimensional Message 👽</div>
+      <div class="message-content">
+        Greetings, traveler!<br /><br />
+        There are <span class="highlight">eight mysterious easter eggs</span> hidden throughout this dimensional journey.<br /><br />
+        Finding them all will unlock the door to <span class="highlight">another dimension</span>...<br /><br />
+        Are you ready for the challenge? 🚀
+      </div>
+    </div>
+
         <!-- Portal Navigation -->
         <nav class="portal-nav">
-          <div
-            class="portal-btn"
-            data-target="home"
-            style="border-color: white"
-          ></div>
-          <div
-            class="portal-btn"
-            data-target="about"
-            style="border-color: var(--primary)"
-          ></div>
-          <div
-            class="portal-btn"
-            data-target="projects"
-            style="border-color: var(--tertiary)"
-          ></div>
-          <div
-            class="portal-btn"
-            data-target="education"
-            style="border-color: var(--secondary)"
-          ></div>
-          <div
-            class="portal-btn"
-            data-target="certificates"
-            style="border-color: #44ff77"
-          ></div>
-          <div
-            class="portal-btn"
-            data-target="contact"
-            style="border-color: #ffaa44"
-          ></div>
+      <div class="portal-btn" data-target="home" style="border-color: white"></div>
+      <div class="portal-btn" data-target="about" style="border-color: var(--primary)"></div>
+      <div class="portal-btn" data-target="projects" style="border-color: var(--tertiary)"></div>
+      <div class="portal-btn" data-target="education" style="border-color: var(--secondary)"></div>
+      <div class="portal-btn" data-target="certificates" style="border-color: #44ff77"></div>
+      <div class="portal-btn" data-target="contact" style="border-color: #ffaa44"></div>
         </nav>
 
-        <script>
-          document.addEventListener("DOMContentLoaded", function () {
-            // Portal Navigation
-            const portalBtns = document.querySelectorAll(".portal-btn");
-            const dimensions = document.querySelectorAll(".dimension");
-            const transitions = {
-              home: document.getElementById("portal-transition"),
-              about: document.getElementById("warp-transition"),
-              projects: document.getElementById("fold-transition"),
-              education: document.getElementById("portal-transition"),
-              certificates: document.getElementById("warp-transition"),
-              contact: document.getElementById("fold-transition"),
-            };
-
-            portalBtns.forEach((btn) => {
-              btn.addEventListener("click", function () {
-                const targetId = this.getAttribute("data-target");
-                const transition = transitions[targetId];
-
-                // Play transition effect
-                transition.style.opacity = "1";
-                setTimeout(() => {
-                  transition.style.opacity = "0";
-                }, 1500);
-
-                // Change active dimension
-                dimensions.forEach((dim) => {
-                  dim.classList.remove("active");
-                });
-                document.getElementById(targetId).classList.add("active");
-              });
-            });
-
-            // About Me - Interactive Personality Elements
-            const personalityElements = document.querySelectorAll(
-              ".personality-element"
-            );
-
-            function randomMovement() {
-              personalityElements.forEach((elem) => {
-                const currentTop = parseFloat(elem.style.top);
-                const currentLeft = parseFloat(elem.style.left);
-
-                // Random movements within 5% of current position
-                const newTop = Math.max(
-                  0,
-                  Math.min(90, currentTop + (Math.random() - 0.5) * 10)
-                );
-                const newLeft = Math.max(
-                  0,
-                  Math.min(90, currentLeft + (Math.random() - 0.5) * 10)
-                );
-
-                elem.style.top = `${newTop}%`;
-                elem.style.left = `${newLeft}%`;
-              });
-
-              setTimeout(randomMovement, 3000);
-            }
-
-            setTimeout(randomMovement, 3000);
-
-            // Matrix Rain Easter Egg
-            const matrixCanvas = document.getElementById("matrixRain");
-            const ctx = matrixCanvas.getContext("2d");
-            let matrixActive = false;
-
-            function setupMatrixRain() {
-              matrixCanvas.width = window.innerWidth;
-              matrixCanvas.height = window.innerHeight;
-
-              const fontSize = 14;
-              const columns = matrixCanvas.width / fontSize;
-
-              // Array to store the y position of each column
-              const drops = [];
-              for (let i = 0; i < columns; i++) {
-                drops[i] = 1;
-              }
-
-              function drawMatrix() {
-                if (!matrixActive) return;
-
-                // Semi-transparent black to create fade effect
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-                ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-
-                ctx.fillStyle = "#0F0"; // Green text
-                ctx.font = fontSize + "px monospace";
-
-                // For each column
-                for (let i = 0; i < drops.length; i++) {
-                  // Random character
-                  const text = String.fromCharCode(Math.random() * 128);
-
-                  // x = i*fontSize, y = drops[i]*fontSize
-                  ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                  // After drawing, increment y coordinate
-                  if (
-                    drops[i] * fontSize > matrixCanvas.height &&
-                    Math.random() > 0.975
-                  ) {
-                    drops[i] = 0;
-                  }
-
-                  drops[i]++;
-                }
-
-                requestAnimationFrame(drawMatrix);
-              }
-
-              requestAnimationFrame(drawMatrix);
-            }
-
-            // Easter Eggs
-            // Egg 1: Matrix Rain
-            document
-              .querySelector(".egg-1")
-              .addEventListener("click", function () {
-                matrixActive = !matrixActive;
-                matrixCanvas.style.display = matrixActive ? "block" : "none";
-                if (matrixActive) {
-                  setupMatrixRain();
-                }
-              });
-
-            // Egg 2: Personality Elements Reorganize
-
-            document
-              .querySelector(".egg-2")
-              .addEventListener("click", function () {
-                personalityElements.forEach((elem) => {
-                  elem.style.top = `${Math.random() * 80 + 10}%`;
-                  elem.style.left = `${Math.random() * 80 + 10}%`;
-                  elem.style.transform = `rotate(${
-                    Math.random() * 20 - 10
-                  }deg)`;
-                });
-              });
-
-            // Egg 3: Gravity effect on education timeline
-            document
-              .querySelector(".egg-3")
-              .addEventListener("click", function () {
-                const educationItems =
-                  document.querySelectorAll(".education-item");
-
-                educationItems.forEach((item) => {
-                  // Apply "falling" animation
-                  item.style.transition =
-                    "all 2s cubic-bezier(.17,.67,.83,.67)";
-                  item.style.top = "85%";
-
-                  // Then restore them with physics motion
-                  setTimeout(() => {
-                    item.style.transition = "all 1s cubic-bezier(0,1.5,.5,1)";
-                    const originalTop = item.style.top;
-                    item.style.top = originalTop;
-                  }, 2000);
-                });
-              });
-
-            // Konami Code Easter Egg
-            const konamiCode = [
-              "ArrowUp",
-              "ArrowUp",
-              "ArrowDown",
-              "ArrowDown",
-              "ArrowLeft",
-              "ArrowRight",
-              "ArrowLeft",
-              "ArrowRight",
-              "b",
-              "a",
-            ];
-            let konamiIndex = 0;
-
-            document.addEventListener("keydown", function (e) {
-              if (e.key === konamiCode[konamiIndex]) {
-                konamiIndex++;
-
-                if (konamiIndex === konamiCode.length) {
-                  // Activate 8-bit mode easter egg
-                  document.body.style.fontFamily =
-                    "'Press Start 2P', cursive, monospace";
-                  document.body.style.imageRendering = "pixelated";
-
-                  // Add pixel overlay
-                  const pixelOverlay = document.createElement("div");
-                  pixelOverlay.style.position = "fixed";
-                  pixelOverlay.style.top = "0";
-                  pixelOverlay.style.left = "0";
-                  pixelOverlay.style.width = "100%";
-                  pixelOverlay.style.height = "100%";
-                  pixelOverlay.style.backgroundImage =
-                    'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABtJREFUeNpi+M/A8J+BkYGBgZGBgYGJgYEBIMAABRgAFicINQUdKJ4AAAAASUVORK5CYII=")';
-                  pixelOverlay.style.pointerEvents = "none";
-                  pixelOverlay.style.zIndex = "100";
-                  pixelOverlay.style.opacity = "0.1";
-                  document.body.appendChild(pixelOverlay);
-
-                  // Play 8-bit sound
-                  const sound = new Audio(
-                    "data:audio/mp3;base64,SUQzAwAAAAAfdlRJVDIAAAAZAAAATWFyaW8gMSBVcCBTb3VuZCBFZmZlY3RUUEUxAAAADQAAAFVuaXF1ZSBJRDogMVRDT04AAAAPAAAAUmV0cm8gR2FtZXMgU0ZYDVRUQ08AAAAPAAAAU291bmQgRWZmZWN0c09TU1QAAAAiAAAATGF2ZjU2LjQwLjEwMSBMaWJyYXJ5IChPcGVuIFNvdXJjZSk="
-                  );
-                  sound.play();
-
-                  // Reset index for next time
-                  konamiIndex = 0;
-
-                  // Return to normal after 5 seconds
-                  setTimeout(() => {
-                    document.body.style.fontFamily = "";
-                    document.body.style.imageRendering = "";
-                    document.body.removeChild(pixelOverlay);
-                  }, 5000);
-                }
-              } else {
-                konamiIndex = 0;
-              }
-            });
-
-            // Hidden portal to secret dimension
-            // Create a hidden portal that appears when clicking a specific sequence of elements
-            let secretSequence = [];
-            const correctSequence = ["about", "projects", "education", "about"];
-
-            portalBtns.forEach((btn) => {
-              btn.addEventListener("click", function () {
-                const dimension = this.getAttribute("data-target");
-                secretSequence.push(dimension);
-
-                // Keep only the last 4 entries
-                if (secretSequence.length > 4) {
-                  secretSequence.shift();
-                }
-
-                // Check if sequence matches
-                if (
-                  secretSequence.length === 4 &&
-                  secretSequence.every(
-                    (val, idx) => val === correctSequence[idx]
-                  )
-                ) {
-                  // Create secret portal
-                  const secretPortal = document.createElement("div");
-                  secretPortal.className = "portal-btn";
-                  secretPortal.style.borderColor = "#ff0000";
-                  secretPortal.style.animation = "pulse 1s infinite";
-                  secretPortal.style.position = "fixed";
-                  secretPortal.style.top = "50%";
-                  secretPortal.style.left = "50%";
-                  secretPortal.style.transform = "translate(-50%, -50%)";
-                  secretPortal.style.width = "100px";
-                  secretPortal.style.height = "100px";
-                  secretPortal.style.zIndex = "1000";
-
-                  document.body.appendChild(secretPortal);
-
-                  // Portal click event
-                  secretPortal.addEventListener("click", function () {
-                    // Show secret message
-                    alert(
-                      "You've discovered the secret dimension! The truth is that this portfolio exists in infinite dimensions... just like your potential. Never stop exploring!"
-                    );
-
-                    // Remove portal
-                    document.body.removeChild(secretPortal);
-
-                    // Reset sequence
-                    secretSequence = [];
-                  });
-
-                  // Auto-remove after 5 seconds if not clicked
-                  setTimeout(() => {
-                    if (document.body.contains(secretPortal)) {
-                      document.body.removeChild(secretPortal);
-                    }
-                  }, 5000);
-                }
-              });
-            });
-
-            // Interactive project physics
-            const projectElements =
-              document.querySelectorAll(".project-dimension");
-
-            projectElements.forEach((project) => {
-              project.addEventListener("mousemove", function (e) {
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left; // x position within element
-                const y = e.clientY - rect.top; // y position within element
-
-                // Calculate rotation based on mouse position
-                const rotateY = (x / rect.width - 0.5) * 30;
-                const rotateX = (y / rect.height - 0.5) * -30;
-
-                // Apply the rotation
-                const cube = this.querySelector(".project-cube");
-                cube.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
-              });
-
-              project.addEventListener("mouseleave", function () {
-                const cube = this.querySelector(".project-cube");
-                cube.style.transform = "";
-              });
-            });
-
-            // Click animation for certificates
-            const certificates = document.querySelectorAll(
-              ".certificate-artifact"
-            );
-
-            certificates.forEach((cert) => {
-              cert.addEventListener("click", function () {
-                const inner = this.querySelector(".certificate-inner");
-
-                // Add floating animation
-                inner.style.animation = "float 2s ease-in-out";
-
-                // Remove animation after it completes
-                setTimeout(() => {
-                  inner.style.animation = "";
-                }, 2000);
-              });
-            });
-
-            // Add floating animation
-            document.head.insertAdjacentHTML(
-              "beforeend",
-              `
-              <style>
-                  @keyframes float {
-                      0% { transform: translateY(0px); }
-                      50% { transform: translateY(-20px); }
-                      100% { transform: translateY(0px); }
-                  }
-
-                  @keyframes pulse {
-                      0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
-                      70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); }
-                      100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
-                  }
-              </style>
-          `
-            );
-
-            // Contact door interactions
-            const contactDoors = document.querySelectorAll(".contact-door");
-
-            contactDoors.forEach((door) => {
-              door.addEventListener("click", function () {
-                // Expand to show details
-                this.style.width = "250px";
-                this.style.height = "300px";
-
-                // Show contact form or details
-                const details = this.querySelector(".door-details");
-                details.style.opacity = "1";
-
-                // Reset other doors
-                contactDoors.forEach((otherDoor) => {
-                  if (otherDoor !== this) {
-                    otherDoor.style.width = "200px";
-                    otherDoor.style.height = "250px";
-                    otherDoor.querySelector(".door-details").style.opacity =
-                      "0";
-                  }
-                });
-              });
-            });
-
-            // Hidden music player easter egg
-            // Double-click on home screen to activate
-            let musicActive = false;
-            const homeSection = document.getElementById("home");
-
-            homeSection.addEventListener("dblclick", function () {
-              if (!musicActive) {
-                // Create audio element
-                const music = document.createElement("audio");
-                music.id = "background-music";
-                music.loop = true;
-                music.volume = 0.3;
-
-                // Use base64 encoded small audio or a URL
-                music.src =
-                  "https://cdnjs.cloudflare.com/ajax/libs/free-web-sound-effects/220509/220509.mp3";
-
-                document.body.appendChild(music);
-                music.play();
-
-                // Create music controls
-                const controls = document.createElement("div");
-                controls.id = "music-controls";
-                controls.innerHTML = `
-                      <div style="position:fixed;bottom:80px;right:20px;background:rgba(0,0,0,0.5);padding:10px;border-radius:5px;z-index:100;">
-                          <button id="toggle-music" style="background:none;border:none;color:white;cursor:pointer;">🔊</button>
-                      </div>
-                  `;
-
-                document.body.appendChild(controls);
-
-                // Toggle button functionality
-                document
-                  .getElementById("toggle-music")
-                  .addEventListener("click", function () {
-                    const music = document.getElementById("background-music");
-                    if (music.paused) {
-                      music.play();
-                      this.textContent = "🔊";
-                    } else {
-                      music.pause();
-                      this.textContent = "🔇";
-                    }
-                  });
-
-                musicActive = true;
-              }
-            });
-
-            // Window resize handling
-            window.addEventListener("resize", function () {
-              // Update matrix canvas if active
-              if (matrixActive) {
-                matrixCanvas.width = window.innerWidth;
-                matrixCanvas.height = window.innerHeight;
-              }
-            });
-
-            // Custom cursor (subtle dimension effect)
-            const cursor = document.createElement("div");
-            cursor.style.position = "fixed";
-            cursor.style.width = "20px";
-            cursor.style.height = "20px";
-            cursor.style.borderRadius = "50%";
-            cursor.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
-            cursor.style.transform = "translate(-50%, -50%)";
-            cursor.style.pointerEvents = "none";
-            cursor.style.zIndex = "9999";
-            cursor.style.transition =
-              "width 0.3s, height 0.3s, background-color 0.3s";
-
-            document.body.appendChild(cursor);
-
-            // Update cursor position
-            document.addEventListener("mousemove", function (e) {
-              cursor.style.left = e.clientX + "px";
-              cursor.style.top = e.clientY + "px";
-            });
-
-            // Change cursor on interactive elements
-            document
-              .querySelectorAll(
-                "a, button, .portal-btn, .project-dimension, .certificate-artifact, .contact-door, .personality-element, .easter-egg"
-              )
-              .forEach((element) => {
-                element.addEventListener("mouseenter", function () {
-                  cursor.style.width = "30px";
-                  cursor.style.height = "30px";
-                  cursor.style.backgroundColor =
-                    "rgba(var(--tertiary-rgb), 0.4)";
-                });
-
-                element.addEventListener("mouseleave", function () {
-                  cursor.style.width = "20px";
-                  cursor.style.height = "20px";
-                  cursor.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
-                });
-              });
-
-            // Add CSS variable for RGB value
-            document.head.insertAdjacentHTML(
-              "beforeend",
-              `
-              <style>
-                  :root {
-                      --tertiary-rgb: 68, 217, 255;
-                  }
-              </style>
-          `
-            );
-
-            // Auto-cycle through dimensions for initial preview
-            // Shows each dimension briefly when the page loads
-            let currentIndex = 0;
-            const dimensionIds = [
-              "home",
-              "about",
-              "projects",
-              "education",
-              "certificates",
-              "contact",
-            ];
-
-            function cyclePreview() {
-              if (currentIndex >= dimensionIds.length) {
-                // End preview and stay on home
-                dimensions.forEach((dim) => dim.classList.remove("active"));
-                document.getElementById("home").classList.add("active");
-                return;
-              }
-
-              // Activate current dimension
-              dimensions.forEach((dim) => dim.classList.remove("active"));
-              document
-                .getElementById(dimensionIds[currentIndex])
-                .classList.add("active");
-
-              // Show transition effect
-              const transition = transitions[dimensionIds[currentIndex]];
-              transition.style.opacity = "1";
-              setTimeout(() => {
-                transition.style.opacity = "0";
-              }, 700);
-
-              currentIndex++;
-              setTimeout(cyclePreview, 800);
-            }
-
-            // Start preview after 2 seconds
-            setTimeout(cyclePreview, 2000);
-          });
-        </script>
+    <script src="js/script.js"></script>
       </body>
-    </html>
-  </head>
 </html>
